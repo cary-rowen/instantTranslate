@@ -63,6 +63,7 @@ jobs:
         addon_name: ${{ steps.extract_addon_info.outputs.addon_name }}
         addon_version: ${{ steps.extract_addon_info.outputs.addon_version }}
         channel: ${{ steps.extract_addon_info.outputs.addon_updateChannel }}
+        channel: "Gozaltech"
         download_url: ${{ fromJSON(steps.release.outputs.assets)[0].browser_download_url }}
         token: ${{ secrets.REPO_TOKEN }}
 
