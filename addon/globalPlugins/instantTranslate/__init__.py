@@ -64,6 +64,7 @@ confspec = {
 "autoswap": "boolean(default=true)",
 "isautoswapped": "boolean(default=false)",
 "replaceUnderscores": "boolean(default=false)",
+"useMirror": "boolean(default=false)",
 }
 
 # Define speakOnDemand parameter for all scripts needing it
@@ -114,7 +115,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		self._speak = speechModule.speak
 		speechModule.speak = self._localSpeak
 		self.lastSpokenText = ''
-		self.settings = {"lang_from": "from", "lang_to": "into", "lang_swap": "swap", "copyTranslation": "copytranslatedtext", "autoSwap": "autoswap", "isAutoSwapped": "isautoswapped", "replaceUnderscores": "replaceUnderscores"}
+		self.settings = {"lang_from": "from", "lang_to": "into", "lang_swap": "swap", "copyTranslation": "copytranslatedtext", "autoSwap": "autoswap", "isAutoSwapped": "isautoswapped", "replaceUnderscores": "replaceUnderscores", "useMirror": "useMirror"}
 		[setattr(self.__class__, propertyMethod, property(lambda self, propertyName=propertyName: self.addonConf[propertyName], lambda self, value, propertyName=propertyName: self.addonConf.__setitem__(propertyName, value))) for propertyMethod, propertyName in self.settings.items()]
 
 	def getScript(self, gesture):
@@ -219,7 +220,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 #		if langFrom == "auto":
 #			langFrom = detect_language(text)
 		translation = None
-		myTranslator = Translator(langFrom, langTo, text, langSwap)
+		myTranslator = Translator(langFrom, langTo, text, langSwap, self.useMirror)
 		myTranslator.start()
 		i=0
 		while myTranslator.is_alive():
@@ -259,7 +260,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		# Translators: message presented to announce that the source and target languages have been swapped.
 		ui.message(_("Languages swapped"))
 		# Translators: message presented to announce the current source and target languages.
-		ui.message(_("Translate: from {lang1} to {lang2}").format(lang1=self.lang_from, lang2=self.lang_to))
+		ui.message(_("Translate: from {lang1} to {lang2}").format(lang1=g(self.lang_from, short=True), lang2=g(self.lang_to, short=True)))
 		try:
 			# NVDA 2024.1+
 			shouldTranslate = speech.getState().speechMode != speech.SpeechMode.onDemand
@@ -276,7 +277,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	)
 	def script_announceLanguages(self, gesture):
 		# Translators: message presented to announce the current source and target languages.
-		ui.message(_("Translate: from {lang1} to {lang2}").format(lang1=self.lang_from, lang2=self.lang_to))
+		ui.message(_("Translate: from {lang1} to {lang2}").format(lang1=g(self.lang_from, short=True), lang2=g(self.lang_to, short=True)))
 
 	@scriptHandler.script(
 	)
